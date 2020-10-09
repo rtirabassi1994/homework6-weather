@@ -1,15 +1,10 @@
 
 
-// //declare your api key as a global variable
 var apiKey = "d59832120efe0beac1c8d9640880067c";
 // //declare and queries as a variable
-// var input1 = $("#city-search").val()
-// var forecastQuery = "https://api.openweathermap.org/data/2.5/weather?q=" + input1 + "&appid=" + apiKey;
-// var fiveDayQuery = "";
-// var uvQuery = "http://api.openweathermap.org/data/2.5/uvi?lat={lat}&lon={lon}&appid={API key}"
+
 
 $("#search-input").on("click", function(){
-    //declare and queries as a variable
     var input1 = $("#city-search").val()
     var forecastQuery = "https://api.openweathermap.org/data/2.5/weather?q=" + input1 + "&appid=" + apiKey;
     $.ajax({
@@ -18,22 +13,42 @@ $("#search-input").on("click", function(){
     }).then(function(response){
         console.log(response);
         console.log(response.name);
+        var cityName = response.name;
         var fTemp = convertTemp(response.main.temp);
+        var humidity = response.main.humidity;
+        var windSpeed = response.wind.speed;
+        var date = new Date();
+        
+        var lat = response.coord.lat;
+        var long = response.coord.lon;
+        var uvQuery = "https://api.openweathermap.org/data/2.5/uvi?lat=" + lat + "&lon=" + long +"&appid=" +apiKey;
+        $.ajax({
+            url: uvQuery,
+            method: "GET"
+        }).then(function(response){
+            console.log(response);
+            var uvIndex = response.value;
 
-        var forecastBlock =`<h1>${response.name}</h1>`
-        var weatherBlock = `<div class="jumbotron jumbotron-fluid">
-        <div class="container">
-        <h1>${response.name}</h1> 
-        <h2 class="display-4">${fTemp} \u00B0 F</h2>
-        <p class="lead">This is a modified jumbotron that occupies the entire horizontal space of its parent.</p>
-        </div>
-      </div>`
+        
+        
+            // var forecastBlock =`<h1>${cityName}</h1>`
+            var weatherBlock = `<div class="jumbotron jumbotron-fluid">
+            <div class="container">
+            <h1>${cityName} (${parseInt(date.getMonth()+1) + "/" + date.getDate() + "/" + date.getFullYear()})</h1> 
+            <h2 class="display-4">${fTemp}\u00B0F</h2>
+            <p>Humidity: ${humidity}\u0025</p>
+            <p>Wind Speed: ${windSpeed} MPH</p>
+            <p>UV Index: ${uvIndex}</p>
+            </div>
+            </div>`
 
-        $("#history-column").html(forecastBlock);
-        console.log(weatherBlock)
-        $("#weather-forecast").html(weatherBlock);
+            // $("#history-column").html(forecastBlock);
+            // console.log(weatherBlock)
+            $("#weather-forecast").html(weatherBlock);
+
+        })
+        
         //fiveDayForecast(userInput);
-        //uvIndex(response.coord.lat, response.coord.lon);
     })
 
 });
@@ -55,14 +70,16 @@ $("#search-input").on("click", function(){
 // }
 
 function fiveDayForecast(userInput){
+    // var fiveDayQuery = "api.openweathermap.org/data/2.5/forecast?q=" + {city name}+ "&appid" + apiKey;
+    var fiveDayQuery = "https://api.openweathermap.org/data/2.5/onecall?lat=" + lat + "&lon=" + long + "&appid=" + apiKey;
+    $.ajax({
+        type: "GET",
+        url: fiveDayQuery
+    }).then(function(response){
+        console.log(response);
 
-}
+})}
 
-function uvIndex(lat, lon){
-    uvQuery = "http://api.openweathermap.org/data/2.5/uvi?lat={lat}&lon={lon}&appid={API key}"
-
-
-}
 
 $(document).ready(function(){
 
@@ -79,3 +96,6 @@ function convertTemp(kelvin){
     var cel = kelvin - 273.15;
     return Math.round(cel * 9/5 + 32)
 }
+
+
+// will probably be able to delete
